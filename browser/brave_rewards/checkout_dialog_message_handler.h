@@ -1,0 +1,69 @@
+/* Copyright 2020 The Brave Authors. All rights reserved.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+#ifndef BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_MESSAGE_HANDLER_H_
+#define BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_MESSAGE_HANDLER_H_
+
+#include <memory>
+
+#include "base/values.h"
+#include "base/memory/weak_ptr.h"
+#include "brave/components/brave_rewards/browser/rewards_service.h"
+#include "brave/components/brave_rewards/browser/rewards_service_observer.h"
+#include "content/public/browser/web_ui_message_handler.h"
+
+namespace brave_rewards {
+
+class CheckoutDialogMessageHandler : public content::WebUIMessageHandler,
+                                     public RewardsServiceObserver {
+ public:
+  CheckoutDialogMessageHandler();
+
+  CheckoutDialogMessageHandler(
+      const CheckoutDialogMessageHandler&) = delete;
+  CheckoutDialogMessageHandler& operator=(
+      const CheckoutDialogMessageHandler&) = delete;
+
+  ~CheckoutDialogMessageHandler() override;
+
+  // WebUIMessageHandler:
+  void RegisterMessages() override;
+
+  // RewardsServiceObserver:
+  void OnWalletInitialized(RewardsService* service, int32_t result) override;
+  void OnRewardsMainEnabled(RewardsService* service, bool enabled) override;
+
+ private:
+  RewardsService* GetRewardsService();
+
+  // Message handlers:
+  void OnGetWalletBalance(const base::ListValue* args);
+  void OnGetAnonWalletStatus(const base::ListValue* args);
+  void OnGetExternalWallet(const base::ListValue* args);
+  void OnGetRewardsEnabled(const base::ListValue* args);
+  void OnEnableRewards(const base::ListValue* args);
+  void OnCreateWallet(const base::ListValue* args);
+  void OnCancelPayment(const base::ListValue* args);
+
+  // Rewards service callbacks:
+  void FetchBalanceCallback(
+      int32_t status,
+      std::unique_ptr<brave_rewards::Balance> balance);
+
+  void GetExternalWalletCallback(
+      int32_t status,
+      std::unique_ptr<brave_rewards::ExternalWallet> wallet);
+
+  void GetAnonWalletStatusCallback(uint32_t result);
+  void GetRewardsMainEnabledCallback(bool enabled);
+  void CreateWalletCallback(int32_t result);
+
+  RewardsService* rewards_service_ = nullptr;  // NOT OWNED
+  base::WeakPtrFactory<CheckoutDialogMessageHandler> weak_factory_;
+};
+
+}
+
+#endif  // BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_MESSAGE_HANDLER_H_
