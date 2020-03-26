@@ -27,6 +27,7 @@ export const MainPanel = styled.div<{ showBackground?: boolean }>`
 
   a {
     color: ${p => p.theme.color.brandBat};
+    text-decoration: none;
   }
 `
 
