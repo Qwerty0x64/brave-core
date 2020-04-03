@@ -5,6 +5,7 @@
 #include <map>
 
 #include "base/files/file_path.h"
+#include "components/crash/core/app/crashpad.h"
 
 namespace crashpad {
 
@@ -37,7 +38,7 @@ crashpad::BraveCrashpadClient& GetBraveCrashpadClient() {
 
 #define COMPONENTS_CRASH_CONTENT_APP_CRASHPAD_H_
 #define GetCrashpadClient GetBraveCrashpadClient
-#include "../../../../../../components/crash/content/app/crashpad_win.cc"
+#include "../../../../../../components/crash/core/app/crashpad_win.cc"
 #undef GetCrashpadClient
 
 namespace crash_reporter {
