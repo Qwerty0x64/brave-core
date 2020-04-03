@@ -18,7 +18,7 @@ import org.chromium.chrome.browser.settings.website.SiteSettingsCategory.Type;
 
 import java.util.HashMap;
 
-public class BraveSiteSettingsPreferencesBase extends BravePreferenceFragment {
+public class BraveSiteSettingsPreferencesBase extends SiteSettingsPreferenceFragment {
     private static final String DESKTOP_MODE_CATEGORY_KEY = "desktop_mode_category";
     private static final String PLAY_YT_VIDEO_IN_BROWSER_CATEGORY_KEY = "play_yt_video_in_browser_category";
     private static final String ADS_KEY = "ads";
