@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
-index 2569ed7ae15e5ee4ad17681982edbf545b2f9efc..eb424e7319ea6ccccb2c479f522652fe11ed9967 100644
+index 8a49b80ce9c4507f46454ca0a49afe58805cbb51..3a95b834c7348faf962deca7630c086089d8f4a4 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
 @@ -48,7 +48,7 @@ import java.util.Set;
