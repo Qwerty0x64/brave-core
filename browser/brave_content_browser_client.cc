@@ -99,7 +99,7 @@ using extensions::ChromeContentBrowserClientExtensionsPart;
 #include "brave/components/speedreader/speedreader_switches.h"
 #include "brave/components/speedreader/speedreader_throttle.h"
 #include "brave/components/speedreader/speedreader_whitelist.h"
-#include "content/public/common/resource_type.h"
+#include "third_party/blink/public/mojom/loader/resource_load_info.mojom-shared.h"
 #endif
 
 namespace {
@@ -275,7 +275,7 @@ BraveContentBrowserClient::CreateURLLoaderThrottles(
     // Work only with casual main frame navigations.
     if (request.url.SchemeIsHTTPOrHTTPS() &&
         request.resource_type ==
-        static_cast<int>(content::ResourceType::kMainFrame)) {
+            static_cast<int>(blink::mojom::ResourceType::kMainFrame)) {
       // Note that we check the whitelist before any redirects, while distilling
       // will be performed on a final document (the last in the redirect chain).
       auto* whitelist = g_brave_browser_process->speedreader_whitelist();
