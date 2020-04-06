@@ -6,11 +6,15 @@
 #ifndef BRAVE_CHROMIUM_SRC_THIRD_PARTY_BLINK_PUBLIC_PLATFORM_WEB_CONTENT_SETTINGS_CLIENT_H_
 #define BRAVE_CHROMIUM_SRC_THIRD_PARTY_BLINK_PUBLIC_PLATFORM_WEB_CONTENT_SETTINGS_CLIENT_H_
 
-#define BRAVE_WEB_CONTENT_SETTINGS_CLIENT_H \
-  virtual bool AllowAutoplay(bool default_value) { return default_value; }
+#define AllowDatabase                                           \
+  AllowAutoplay(bool default_value) { return default_value; }   \
+  virtual bool AllowFingerprinting(bool enabled_per_settings) { \
+    return enabled_per_settings;                                \
+  }                                                             \
+  virtual bool AllowDatabase
 
-#include "../../../../../third_party/blink/public/platform/web_content_settings_client.h"  // NOLINT
+#include "../../../../../../third_party/blink/public/platform/web_content_settings_client.h"
 
-#undef BRAVE_WEB_CONTENT_SETTINGS_CLIENT_H
+#undef AllowDatabase
 
 #endif  // BRAVE_CHROMIUM_SRC_THIRD_PARTY_BLINK_PUBLIC_PLATFORM_WEB_CONTENT_SETTINGS_CLIENT_H_
