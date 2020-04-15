@@ -8,6 +8,7 @@ package org.chromium.chrome.browser.partnercustomizations;
 import android.content.SharedPreferences;
 
 import org.chromium.base.ContextUtils;
+import org.chromium.chrome.browser.homepage.HomepageManager;
 import org.chromium.chrome.browser.ntp.NewTabPage;
 
 public class CloseBraveManager {
