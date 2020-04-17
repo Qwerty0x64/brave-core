@@ -10,18 +10,28 @@
 
 namespace brave_rewards {
 
+using base::Bind;
+using base::BindOnce;
 using base::BindRepeating;
 
-CheckoutDialogMessageHandler::CheckoutDialogMessageHandler()
-    : weak_factory_(this) {}
+CheckoutDialogMessageHandler::CheckoutDialogMessageHandler(
+    CheckoutDialogController* controller)
+    : controller_(controller),
+      weak_factory_(this) {
+  DCHECK(controller_);
+  controller_->AddObserver(this);
+}
 
 CheckoutDialogMessageHandler::~CheckoutDialogMessageHandler() {
+  controller_->RemoveObserver(this);
   if (rewards_service_) {
     rewards_service_->RemoveObserver(this);
   }
 }
 
 RewardsService* CheckoutDialogMessageHandler::GetRewardsService() {
+  // TODO(zenparsing): Consider whether we can do this in constructor
+  // instead.
   if (!rewards_service_) {
     Profile* profile = Profile::FromWebUI(web_ui());
     rewards_service_ = RewardsServiceFactory::GetForProfile(profile);
@@ -78,11 +88,19 @@ void CheckoutDialogMessageHandler::OnRewardsMainEnabled(
   GetRewardsMainEnabledCallback(enabled);
 }
 
+void CheckoutDialogMessageHandler::OnAbort() {
+  // TODO(zenparsing): Perform same functionality as OnCancelPayment
+}
+
+void CheckoutDialogMessageHandler::OnComplete() {
+  // TODO(zenparsing): Update flow state to complete
+}
+
 void CheckoutDialogMessageHandler::OnGetWalletBalance(
     const base::ListValue* args) {
   if (auto* service = GetRewardsService()) {
     AllowJavascript();
-    service->FetchBalance(base::BindOnce(
+    service->FetchBalance(BindOnce(
         &CheckoutDialogMessageHandler::FetchBalanceCallback,
         weak_factory_.GetWeakPtr()));
   }
@@ -92,7 +110,7 @@ void CheckoutDialogMessageHandler::OnGetAnonWalletStatus(
     const base::ListValue* args) {
   if (auto* service = GetRewardsService()) {
     AllowJavascript();
-    service->GetAnonWalletStatus(base::BindOnce(
+    service->GetAnonWalletStatus(BindOnce(
         &CheckoutDialogMessageHandler::GetAnonWalletStatusCallback,
         weak_factory_.GetWeakPtr()));
   }
@@ -102,7 +120,7 @@ void CheckoutDialogMessageHandler::OnGetExternalWallet(
     const base::ListValue* args) {
   if (auto* service = GetRewardsService()) {
     AllowJavascript();
-    service->GetExternalWallet("uphold", base::BindOnce(
+    service->GetExternalWallet("uphold", BindOnce(
         &CheckoutDialogMessageHandler::GetExternalWalletCallback,
         weak_factory_.GetWeakPtr()));
   }
@@ -112,7 +130,7 @@ void CheckoutDialogMessageHandler::OnGetRewardsEnabled(
     const base::ListValue* args) {
   if (auto* service = GetRewardsService()) {
     AllowJavascript();
-    service->GetRewardsMainEnabled(base::Bind(
+    service->GetRewardsMainEnabled(Bind(
         &CheckoutDialogMessageHandler::GetRewardsMainEnabledCallback,
         weak_factory_.GetWeakPtr()));
   }
@@ -130,7 +148,7 @@ void CheckoutDialogMessageHandler::OnCreateWallet(
     const base::ListValue* args) {
   if (auto* service = GetRewardsService()) {
     AllowJavascript();
-    service->CreateWallet(base::Bind(
+    service->CreateWallet(Bind(
         &CheckoutDialogMessageHandler::CreateWalletCallback,
         weak_factory_.GetWeakPtr()));
   }

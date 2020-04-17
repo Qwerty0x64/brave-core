@@ -10,16 +10,24 @@
 
 #include "base/values.h"
 #include "base/memory/weak_ptr.h"
+#include "brave/browser/brave_rewards/checkout_dialog_controller.h"
 #include "brave/components/brave_rewards/browser/rewards_service.h"
+#include "brave/components/brave_rewards/browser/rewards_service_observer.h"
 #include "brave/components/brave_rewards/browser/rewards_service_observer.h"
 #include "content/public/browser/web_ui_message_handler.h"
 
 namespace brave_rewards {
 
-class CheckoutDialogMessageHandler : public content::WebUIMessageHandler,
-                                     public RewardsServiceObserver {
+// Defines the interface between JS and C++ for the checkout dialog.
+// This message handler is created by the checkout dialog delegate
+// when the dialog is shown.
+class CheckoutDialogMessageHandler :
+    public content::WebUIMessageHandler,
+    public RewardsServiceObserver,
+    public CheckoutDialogController::Observer {
+
  public:
-  CheckoutDialogMessageHandler();
+  explicit CheckoutDialogMessageHandler(CheckoutDialogController* controller);
 
   CheckoutDialogMessageHandler(
       const CheckoutDialogMessageHandler&) = delete;
@@ -34,6 +42,10 @@ class CheckoutDialogMessageHandler : public content::WebUIMessageHandler,
   // RewardsServiceObserver:
   void OnWalletInitialized(RewardsService* service, int32_t result) override;
   void OnRewardsMainEnabled(RewardsService* service, bool enabled) override;
+
+  // CheckoutDialogController::Observer:
+  void OnAbort() override;
+  void OnComplete() override;
 
  private:
   RewardsService* GetRewardsService();
@@ -61,9 +73,10 @@ class CheckoutDialogMessageHandler : public content::WebUIMessageHandler,
   void CreateWalletCallback(int32_t result);
 
   RewardsService* rewards_service_ = nullptr;  // NOT OWNED
+  CheckoutDialogController* controller_; // NOT OWNED
   base::WeakPtrFactory<CheckoutDialogMessageHandler> weak_factory_;
 };
 
-}
+}  // namespace brave_rewards
 
 #endif  // BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_MESSAGE_HANDLER_H_

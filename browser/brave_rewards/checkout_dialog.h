@@ -7,7 +7,9 @@
 #define BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_H_
 
 #include <string>
+
 #include "base/callback.h"
+#include "brave/browser/brave_rewards/checkout_dialog_controller.h"
 
 namespace content {
 class WebContents;
@@ -15,11 +17,13 @@ class WebContents;
 
 namespace brave_rewards {
 
-using CheckoutDialogClosedCallback = base::OnceCallback<void()>;
-
-void ShowCheckoutDialog(
-    content::WebContents* initiator,
-    CheckoutDialogClosedCallback on_dialog_closed);
+// Displays a tab-modal Brave Rewards checkout dialog. Returns a
+// weak reference to a CheckoutDialogController object that allows
+// the caller to pass messages (i.e. Abort()) to the dialog. The
+// weak reference will be invalidated after the checkout dialog is
+// closed.
+base::WeakPtr<CheckoutDialogController> ShowCheckoutDialog(
+    content::WebContents* initiator);
 
 }
 

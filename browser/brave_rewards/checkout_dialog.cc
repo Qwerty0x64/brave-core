@@ -16,7 +16,7 @@
 #include "chrome/browser/ui/browser_finder.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/webui/constrained_web_dialog_ui.h"
-#include "components/guest_view/browser/guest_view_base.h"
+#include "components/constrained_window/constrained_window_views.h"
 #include "components/web_modal/web_contents_modal_dialog_host.h"
 #include "content/public/browser/web_contents.h"
 #include "ui/web_dialogs/web_dialog_delegate.h"
@@ -34,35 +34,34 @@ constexpr int kDialogMinHeight = 200;
 constexpr int kDialogMaxWidth = 548;
 constexpr int kDialogMaxHeight = 800;
 
+// Returns the maximum dialog size for the specified dialog
+// initiator WebContents. The dialog cannot be larger than
+// the tab contents to which it applies.
 gfx::Size GetMaxDialogSize(WebContents* initiator) {
-  content::WebContents* top_level =
-        guest_view::GuestViewBase::GetTopLevelWebContents(initiator);
-
+  WebContents* top_level =
+      constrained_window::GetTopLevelWebContents(initiator);
   gfx::Size size;
   if (auto* browser = chrome::FindBrowserWithWebContents(top_level)) {
     if (auto* host = browser->window()->GetWebContentsModalDialogHost()) {
       size = host->GetMaximumDialogSize();
     }
   }
-
   if (size.IsEmpty()) {
     size = top_level->GetContainerBounds().size();
   }
-
   size -= gfx::Size(kDialogMargin, 0);
   size.SetToMin(gfx::Size(kDialogMaxWidth, kDialogMaxHeight));
   return size;
 }
 
-using brave_rewards::CheckoutDialogClosedCallback;
+}  // namespace
+
+namespace brave_rewards {
 
 class CheckoutDialogDelegate : public ui::WebDialogDelegate {
  public:
-  CheckoutDialogDelegate(
-      base::Value params,
-      CheckoutDialogClosedCallback closed_callback)
-      : params_(std::move(params)),
-        closed_callback_(std::move(closed_callback)) {}
+  explicit CheckoutDialogDelegate(base::Value params)
+      : params_(std::move(params)) {}
 
   CheckoutDialogDelegate(const CheckoutDialogDelegate&) = delete;
   CheckoutDialogDelegate& operator=(const CheckoutDialogDelegate&) = delete;
@@ -83,8 +82,7 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
 
   void GetWebUIMessageHandlers(
       std::vector<WebUIMessageHandler*>* handlers) const override {
-    DCHECK(handlers);
-    handlers->push_back(new brave_rewards::CheckoutDialogMessageHandler);
+    // Handlers are added in OnDialogShown
   }
 
   void GetDialogSize(gfx::Size* size) const override {
@@ -98,10 +96,13 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
     return json;
   }
 
+  void OnDialogShown(content::WebUI* webui) override {
+    webui->AddMessageHandler(
+        std::make_unique<CheckoutDialogMessageHandler>(&controller_));
+  }
+
   void OnDialogClosed(const std::string& json_retval) override {
-    if (closed_callback_) {
-      std::move(closed_callback_).Run();
-    }
+    controller_.NotifyDialogClosed();
   }
 
   void OnCloseContents(
@@ -114,19 +115,17 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
     return false;
   }
 
+  base::WeakPtr<CheckoutDialogController> GetController() {
+    return controller_.AsWeakPtr();
+  }
+
  private:
   base::Value params_;
-  CheckoutDialogClosedCallback closed_callback_;
-
+  CheckoutDialogController controller_;
 };
 
-}  // namespace
-
-namespace brave_rewards {
-
-void ShowCheckoutDialog(
-    WebContents* initiator,
-    CheckoutDialogClosedCallback on_dialog_closed) {
+base::WeakPtr<CheckoutDialogController> ShowCheckoutDialog(
+    WebContents* initiator) {
   // TODO(zenparsing): Take params from caller
   base::Value order_info(base::Value::Type::DICTIONARY);
   order_info.SetStringKey("description", "Some order description");
@@ -136,8 +135,9 @@ void ShowCheckoutDialog(
   params.SetKey("orderInfo", std::move(order_info));
 
   auto delegate = std::make_unique<CheckoutDialogDelegate>(
-      std::move(params),
-      std::move(on_dialog_closed));
+      std::move(params));
+
+  auto controller = delegate->GetController();
 
   gfx::Size min_size(kDialogMinWidth, kDialogMinHeight);
   gfx::Size max_size = GetMaxDialogSize(initiator);
@@ -148,6 +148,8 @@ void ShowCheckoutDialog(
       initiator,
       min_size,
       max_size);
+
+  return controller;
 }
 
 }  // namespace brave_rewards
