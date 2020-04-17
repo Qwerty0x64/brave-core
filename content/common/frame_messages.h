@@ -13,9 +13,9 @@
 // The message starter should be declared in ipc/ipc_message_start.h. Since
 // we don't want to patch Chromium, we just pretend to be Content Shell.
 
-#define IPC_MESSAGE_START BlinkTestMsgStart
+//#define IPC_MESSAGE_START BlinkTestMsgStart
 
 // Tell RenderFrame(s) to temporary allow scripts from a list of origins once.
-IPC_MESSAGE_ROUTED1(
-    BraveFrameMsg_AllowScriptsOnce,
-    std::vector<std::string> /* origins to allow scripts once */)
+//IPC_MESSAGE_ROUTED1(
+//    BraveFrameMsg_AllowScriptsOnce,
+//    std::vector<std::string> /* origins to allow scripts once */)

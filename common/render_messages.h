@@ -11,12 +11,12 @@
 // The message starter should be declared in ipc/ipc_message_start.h. Since
 // we don't want to patch Chromium, we just pretend to be Content Shell.
 
-#define IPC_MESSAGE_START BlinkTestMsgStart
+//#define IPC_MESSAGE_START BlinkTestMsgStart
 
 // Tells the browser that content in the current page was blocked due to the
 // user's content settings.
-IPC_MESSAGE_ROUTED1(BraveViewHostMsg_JavaScriptBlocked,
-                    base::string16 /* details on blocked content */)
-
-IPC_MESSAGE_ROUTED1(BraveViewHostMsg_FingerprintingBlocked,
-                    base::string16 /* details on blocked content */)
+//IPC_MESSAGE_ROUTED1(BraveViewHostMsg_JavaScriptBlocked,
+//                    base::string16 /* details on blocked content */)
+//
+//IPC_MESSAGE_ROUTED1(BraveViewHostMsg_FingerprintingBlocked,
+//                    base::string16 /* details on blocked content */)

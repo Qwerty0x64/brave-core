@@ -42,10 +42,10 @@ BraveContentSettingsAgentImpl::~BraveContentSettingsAgentImpl() {
 bool BraveContentSettingsAgentImpl::OnMessageReceived(
     const IPC::Message& message) {
   bool handled = true;
-  IPC_BEGIN_MESSAGE_MAP(BraveContentSettingsAgentImpl, message)
-    IPC_MESSAGE_HANDLER(BraveFrameMsg_AllowScriptsOnce, OnAllowScriptsOnce)
-    IPC_MESSAGE_UNHANDLED(handled = false)
-  IPC_END_MESSAGE_MAP()
+  //IPC_BEGIN_MESSAGE_MAP(BraveContentSettingsAgentImpl, message)
+  //  IPC_MESSAGE_HANDLER(BraveFrameMsg_AllowScriptsOnce, OnAllowScriptsOnce)
+  //  IPC_MESSAGE_UNHANDLED(handled = false)
+  //IPC_END_MESSAGE_MAP()
 
   if (handled) return true;
   return ContentSettingsAgentImpl::OnMessageReceived(message);
@@ -79,7 +79,7 @@ bool BraveContentSettingsAgentImpl::IsScriptTemporilyAllowed(
 
 void BraveContentSettingsAgentImpl::BraveSpecificDidBlockJavaScript(
     const base::string16& details) {
-  Send(new BraveViewHostMsg_JavaScriptBlocked(routing_id(), details));
+  //Send(new BraveViewHostMsg_JavaScriptBlocked(routing_id(), details));
 }
 
 bool BraveContentSettingsAgentImpl::AllowScript(
@@ -137,7 +137,7 @@ bool BraveContentSettingsAgentImpl::AllowScriptFromSource(
 
 void BraveContentSettingsAgentImpl::DidBlockFingerprinting(
     const base::string16& details) {
-  Send(new BraveViewHostMsg_FingerprintingBlocked(routing_id(), details));
+  //Send(new BraveViewHostMsg_FingerprintingBlocked(routing_id(), details));
 }
 
 GURL BraveContentSettingsAgentImpl::GetOriginOrURL(

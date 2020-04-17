@@ -140,8 +140,8 @@ BraveShieldsWebContentsObserver::BraveShieldsWebContentsObserver(
 void BraveShieldsWebContentsObserver::RenderFrameCreated(
     RenderFrameHost* rfh) {
   if (rfh && allowed_script_origins_.size()) {
-    rfh->Send(new BraveFrameMsg_AllowScriptsOnce(
-          rfh->GetRoutingID(), allowed_script_origins_));
+    //rfh->Send(new BraveFrameMsg_AllowScriptsOnce(
+    //      rfh->GetRoutingID(), allowed_script_origins_));
   }
 
   WebContents* web_contents = WebContents::FromRenderFrameHost(rfh);
@@ -291,14 +291,14 @@ void BraveShieldsWebContentsObserver::DispatchBlockedEventForWebContents(
 bool BraveShieldsWebContentsObserver::OnMessageReceived(
     const IPC::Message& message, RenderFrameHost* render_frame_host) {
   bool handled = true;
-  IPC_BEGIN_MESSAGE_MAP_WITH_PARAM(BraveShieldsWebContentsObserver,
-        message, render_frame_host)
-    IPC_MESSAGE_HANDLER(BraveViewHostMsg_JavaScriptBlocked,
-        OnJavaScriptBlockedWithDetail)
-    IPC_MESSAGE_HANDLER(BraveViewHostMsg_FingerprintingBlocked,
-        OnFingerprintingBlockedWithDetail)
-    IPC_MESSAGE_UNHANDLED(handled = false)
-  IPC_END_MESSAGE_MAP()
+  //IPC_BEGIN_MESSAGE_MAP_WITH_PARAM(BraveShieldsWebContentsObserver,
+  //      message, render_frame_host)
+  //  IPC_MESSAGE_HANDLER(BraveViewHostMsg_JavaScriptBlocked,
+  //      OnJavaScriptBlockedWithDetail)
+  //  IPC_MESSAGE_HANDLER(BraveViewHostMsg_FingerprintingBlocked,
+  //      OnFingerprintingBlockedWithDetail)
+  //  IPC_MESSAGE_UNHANDLED(handled = false)
+  //IPC_END_MESSAGE_MAP()
   return handled;
 }
 
@@ -346,9 +346,9 @@ void BraveShieldsWebContentsObserver::ReadyToCommitNavigation(
     blocked_url_paths_.clear();
   }
 
-  navigation_handle->GetWebContents()->SendToAllFrames(
-      new BraveFrameMsg_AllowScriptsOnce(
-        MSG_ROUTING_NONE, allowed_script_origins_));
+  //navigation_handle->GetWebContents()->SendToAllFrames(
+  //    new BraveFrameMsg_AllowScriptsOnce(
+  //      MSG_ROUTING_NONE, allowed_script_origins_));
 }
 
 void BraveShieldsWebContentsObserver::AllowScriptsOnce(
