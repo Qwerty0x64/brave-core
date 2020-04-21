@@ -52,7 +52,7 @@ class BraveStatsUpdaterBrowserTest : public InProcessBrowserTest {
 
   void SetBaseUpdateURLForTest() {
     brave::BraveStatsUpdater::SetBaseUpdateURLForTest(
-        embedded_test_server()->GetURL("/1/usage/brave-core"));
+        embedded_test_server()->GetURL("/1/usage/brave-core").spec());
   }
 
   PrefService* GetLocalState() { return &testing_local_state_; }
