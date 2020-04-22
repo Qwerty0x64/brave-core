@@ -38,6 +38,7 @@ class RewardsTabHelper : public RewardsServiceObserver,
   // RewardsServiceObserver overrides.
   void OnRewardsMainEnabled(RewardsService* rewards_service,
                             bool rewards_main_enabled) override;
+  void GetRewardsMainEnabledCallback(bool enabled);
 #endif
 
   // content::WebContentsObserver overrides.

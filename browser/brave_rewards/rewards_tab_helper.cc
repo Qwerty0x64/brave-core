@@ -50,8 +50,14 @@ RewardsTabHelper::RewardsTabHelper(content::WebContents* web_contents)
   Profile* profile =
       Profile::FromBrowserContext(web_contents->GetBrowserContext());
   rewards_service_ = RewardsServiceFactory::GetForProfile(profile);
-  if (rewards_service_)
+  if (rewards_service_) {
     rewards_service_->AddObserver(this);
+#if BUILDFLAG(ENABLE_GREASELION)
+    rewards_service_->GetRewardsMainEnabled(
+        base::Bind(&RewardsTabHelper::GetRewardsMainEnabledCallback,
+                   base::Unretained(this)));
+#endif
+  }
 }
 
 RewardsTabHelper::~RewardsTabHelper() {
@@ -61,6 +67,12 @@ RewardsTabHelper::~RewardsTabHelper() {
   BrowserList::RemoveObserver(this);
 #endif
 }
+
+#if BUILDFLAG(ENABLE_GREASELION)
+void RewardsTabHelper::GetRewardsMainEnabledCallback(bool enabled) {
+  OnRewardsMainEnabled(rewards_service_, enabled);
+}
+#endif
 
 void RewardsTabHelper::DidFinishLoad(
     content::RenderFrameHost* render_frame_host,
