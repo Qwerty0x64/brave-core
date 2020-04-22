@@ -154,6 +154,20 @@ void BraveProfileManager::DoFinalInitForServices(Profile* profile,
 #endif
 }
 
+bool BraveProfileManager::IsAllowedProfilePath(
+    const base::FilePath& path) const {
+  // Chromium only allows profiles to be created in the user_data_dir, but we
+  // want to also be able to create profile in subfolders of user_data_dir.
+  return ProfileManager::IsAllowedProfilePath(path) ||
+         user_data_dir().IsParent(path.DirName());
+}
+
+void BraveProfileManager::AddProfileToStorage(Profile* profile) {
+  if (brave::IsTorProfile(profile))
+    return;
+  ProfileManager::AddProfileToStorage(profile);
+}
+
 void BraveProfileManager::OnProfileCreated(Profile* profile,
                                            bool success,
                                            bool is_new_profile) {

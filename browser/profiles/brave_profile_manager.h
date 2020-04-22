@@ -23,6 +23,8 @@ class BraveProfileManager : public ProfileManager {
   void InitProfileUserPrefs(Profile* profile) override;
   std::string GetLastUsedProfileName() override;
   void SetNonPersonalProfilePrefs(Profile* profile) override;
+  bool IsAllowedProfilePath(const base::FilePath& path) const override;
+  void AddProfileToStorage(Profile* profile) override;
 
   void OnProfileCreated(Profile* profile,
                         bool success,
