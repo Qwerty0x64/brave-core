@@ -7,12 +7,14 @@
 
 #include "brave/components/brave_rewards/browser/rewards_service.h"
 #include "brave/components/brave_rewards/browser/rewards_service_factory.h"
+#include "brave/components/brave_rewards/common/pref_names.h"
 #include "chrome/browser/profiles/profile.h"
 #if !defined(OS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_list.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #endif
+#include "components/prefs/pref_service.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/navigation_handle.h"
@@ -53,9 +55,8 @@ RewardsTabHelper::RewardsTabHelper(content::WebContents* web_contents)
   if (rewards_service_) {
     rewards_service_->AddObserver(this);
 #if BUILDFLAG(ENABLE_GREASELION)
-    rewards_service_->GetRewardsMainEnabled(
-        base::Bind(&RewardsTabHelper::GetRewardsMainEnabledCallback,
-                   base::Unretained(this)));
+    OnRewardsMainEnabled(rewards_service_, profile->GetPrefs()->GetBoolean(
+                                               prefs::kBraveRewardsEnabled));
 #endif
   }
 }
@@ -67,12 +68,6 @@ RewardsTabHelper::~RewardsTabHelper() {
   BrowserList::RemoveObserver(this);
 #endif
 }
-
-#if BUILDFLAG(ENABLE_GREASELION)
-void RewardsTabHelper::GetRewardsMainEnabledCallback(bool enabled) {
-  OnRewardsMainEnabled(rewards_service_, enabled);
-}
-#endif
 
 void RewardsTabHelper::DidFinishLoad(
     content::RenderFrameHost* render_frame_host,
