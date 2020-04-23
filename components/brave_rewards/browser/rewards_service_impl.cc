@@ -58,6 +58,7 @@
 #include "brave/components/brave_rewards/browser/static_values.h"
 #include "brave/components/brave_rewards/browser/switches.h"
 #include "brave/components/brave_rewards/browser/wallet_properties.h"
+#include "brave/components/greaselion/browser/buildflags/buildflags.h"
 #include "brave/components/services/bat_ledger/public/cpp/ledger_client_mojo_proxy.h"
 #include "chrome/browser/bitmap_fetcher/bitmap_fetcher_service_factory.h"
 #include "chrome/browser/browser_process_impl.h"
@@ -94,6 +95,14 @@
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "brave/components/brave_rewards/browser/extension_rewards_service_observer.h"
+#endif
+
+#if BUILDFLAG(ENABLE_GREASELION)
+#include "brave/browser/greaselion/greaselion_service_factory.h"
+#include "brave/components/greaselion/browser/greaselion_service.h"
+
+using greaselion::GreaselionService;
+using greaselion::GreaselionServiceFactory;
 #endif
 
 using net::registry_controlled_domains::INCLUDE_PRIVATE_REGISTRIES;
@@ -1447,6 +1456,14 @@ void RewardsServiceImpl::SetRewardsMainEnabled(bool enabled) {
   SetRewardsMainEnabledPref(enabled);
   bat_ledger_->SetRewardsMainEnabled(enabled);
   TriggerOnRewardsMainEnabled(enabled);
+#if BUILDFLAG(ENABLE_GREASELION)
+  GreaselionService* greaselion_service =
+      GreaselionServiceFactory::GetForBrowserContext(profile_);
+  if (greaselion_service) {
+    greaselion_service->SetFeatureEnabled(greaselion::REWARDS, enabled);
+    greaselion_service->SetFeatureEnabled(greaselion::TWITTER_TIPS, enabled);
+  }
+#endif
 }
 
 void RewardsServiceImpl::GetRewardsMainEnabled(
