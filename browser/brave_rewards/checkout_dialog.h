@@ -7,8 +7,8 @@
 #define BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_H_
 
 #include <string>
+#include <vector>
 
-#include "base/callback.h"
 #include "brave/browser/brave_rewards/checkout_dialog_controller.h"
 
 namespace content {
@@ -23,7 +23,8 @@ namespace brave_rewards {
 // weak reference will be invalidated after the checkout dialog is
 // closed.
 base::WeakPtr<CheckoutDialogController> ShowCheckoutDialog(
-    content::WebContents* initiator);
+    content::WebContents* initiator,
+    CheckoutDialogParams params);
 
 }
 

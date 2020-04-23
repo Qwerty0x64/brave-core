@@ -5,6 +5,7 @@
 
 #include "brave/browser/brave_rewards/checkout_dialog_message_handler.h"
 
+#include "brave/browser/brave_rewards/checkout_dialog.h"
 #include "brave/components/brave_rewards/browser/rewards_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 
@@ -70,6 +71,10 @@ void CheckoutDialogMessageHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback("cancelPayment", BindRepeating(
       &CheckoutDialogMessageHandler::OnCancelPayment,
       base::Unretained(this)));
+
+  web_ui()->RegisterMessageCallback("getOrderInfo", BindRepeating(
+      &CheckoutDialogMessageHandler::OnGetOrderInfo,
+      base::Unretained(this)));
 }
 
 void CheckoutDialogMessageHandler::OnWalletInitialized(
@@ -88,11 +93,11 @@ void CheckoutDialogMessageHandler::OnRewardsMainEnabled(
   GetRewardsMainEnabledCallback(enabled);
 }
 
-void CheckoutDialogMessageHandler::OnAbort() {
+void CheckoutDialogMessageHandler::OnPaymentAborted() {
   // TODO(zenparsing): Perform same functionality as OnCancelPayment
 }
 
-void CheckoutDialogMessageHandler::OnComplete() {
+void CheckoutDialogMessageHandler::OnPaymentCompleted() {
   // TODO(zenparsing): Update flow state to complete
 }
 
@@ -160,6 +165,15 @@ void CheckoutDialogMessageHandler::OnCancelPayment(
   // rewards service, but do not wait to close the dialog.
   AllowJavascript();
   FireWebUIListener("orderCanceled");
+}
+
+void CheckoutDialogMessageHandler::OnGetOrderInfo(
+    const base::ListValue* args) {
+  AllowJavascript();
+  base::Value response(base::Value::Type::DICTIONARY);
+  response.SetDoubleKey("total", controller_->params().total);
+  response.SetStringKey("description", controller_->params().description);
+  FireWebUIListener("orderInfoUpdated", response);
 }
 
 void CheckoutDialogMessageHandler::FetchBalanceCallback(

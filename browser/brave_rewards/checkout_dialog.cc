@@ -60,8 +60,8 @@ namespace brave_rewards {
 
 class CheckoutDialogDelegate : public ui::WebDialogDelegate {
  public:
-  explicit CheckoutDialogDelegate(base::Value params)
-      : params_(std::move(params)) {}
+  explicit CheckoutDialogDelegate(CheckoutDialogParams params)
+      : controller_(std::move(params)) {}
 
   CheckoutDialogDelegate(const CheckoutDialogDelegate&) = delete;
   CheckoutDialogDelegate& operator=(const CheckoutDialogDelegate&) = delete;
@@ -91,9 +91,7 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
   }
 
   std::string GetDialogArgs() const override {
-    std::string json;
-    base::JSONWriter::Write(params_, &json);
-    return json;
+    return std::string();
   }
 
   void OnDialogShown(content::WebUI* webui) override {
@@ -120,27 +118,17 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
   }
 
  private:
-  base::Value params_;
   CheckoutDialogController controller_;
 };
 
 base::WeakPtr<CheckoutDialogController> ShowCheckoutDialog(
-    WebContents* initiator) {
-  // TODO(zenparsing): Take params from caller
-  base::Value order_info(base::Value::Type::DICTIONARY);
-  order_info.SetStringKey("description", "Some order description");
-  order_info.SetDoubleKey("total", 15.0);
-
-  base::Value params(base::Value::Type::DICTIONARY);
-  params.SetKey("orderInfo", std::move(order_info));
-
-  auto delegate = std::make_unique<CheckoutDialogDelegate>(
-      std::move(params));
-
-  auto controller = delegate->GetController();
-
+    WebContents* initiator,
+    CheckoutDialogParams params) {
   gfx::Size min_size(kDialogMinWidth, kDialogMinHeight);
   gfx::Size max_size = GetMaxDialogSize(initiator);
+
+  auto delegate = std::make_unique<CheckoutDialogDelegate>(std::move(params));
+  auto controller = delegate->GetController();
 
   ShowConstrainedWebDialogWithAutoResize(
       initiator->GetBrowserContext(),

@@ -44,8 +44,8 @@ class CheckoutDialogMessageHandler :
   void OnRewardsMainEnabled(RewardsService* service, bool enabled) override;
 
   // CheckoutDialogController::Observer:
-  void OnAbort() override;
-  void OnComplete() override;
+  void OnPaymentAborted() override;
+  void OnPaymentCompleted() override;
 
  private:
   RewardsService* GetRewardsService();
@@ -58,6 +58,7 @@ class CheckoutDialogMessageHandler :
   void OnEnableRewards(const base::ListValue* args);
   void OnCreateWallet(const base::ListValue* args);
   void OnCancelPayment(const base::ListValue* args);
+  void OnGetOrderInfo(const base::ListValue* args);
 
   // Rewards service callbacks:
   void FetchBalanceCallback(
@@ -72,8 +73,8 @@ class CheckoutDialogMessageHandler :
   void GetRewardsMainEnabledCallback(bool enabled);
   void CreateWalletCallback(int32_t result);
 
-  RewardsService* rewards_service_ = nullptr;  // NOT OWNED
-  CheckoutDialogController* controller_; // NOT OWNED
+  CheckoutDialogController* controller_; // Owned by CheckoutDialogDelegate
+  RewardsService* rewards_service_ = nullptr; // Immortal
   base::WeakPtrFactory<CheckoutDialogMessageHandler> weak_factory_;
 };
 

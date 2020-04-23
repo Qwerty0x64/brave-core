@@ -8,20 +8,9 @@ import {
   CreditCardDetails,
   WalletInfo,
   WalletState,
-  OrderInfo,
   Host,
   HostState
 } from '../interfaces'
-
-function parseDialogArgs (): OrderInfo {
-  // TODO(zenparsing): Error handling?
-  const argString = chrome.getVariableValue('dialogArguments')
-  const { orderInfo } = Object(JSON.parse(argString))
-  return {
-    description: orderInfo.description,
-    total: orderInfo.total
-  }
-}
 
 // User wallet data is collated using data from multiple calls
 // to the rewards service. WalletCollator is used to aggregate
@@ -81,13 +70,19 @@ function addWebUIListeners (listeners: object) {
 }
 
 export function createHost (): Host {
-  const stateManager = createStateManager<HostState>({
-    orderInfo: parseDialogArgs()
-  })
-
+  const stateManager = createStateManager<HostState>({});
   const walletCollator = createWalletCollator()
 
   addWebUIListeners({
+
+    orderInfoUpdated (event: any) {
+      stateManager.update({
+        orderInfo: {
+          total: Number(event.total),
+          description: String(event.description)
+        }
+      })
+    },
 
     walletBalanceUpdated (event: any) {
       const total = event.total as number
@@ -148,6 +143,7 @@ export function createHost (): Host {
   chrome.send('getWalletBalance')
   chrome.send('getAnonWalletStatus')
   chrome.send('getExternalWallet')
+  chrome.send('getOrderInfo')
 
   // TODO(zenparsing): Is this required?
   self.i18nTemplate.process(document, self.loadTimeData)

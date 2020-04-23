@@ -5,21 +5,25 @@
 
 #include "brave/browser/brave_rewards/checkout_dialog_controller.h"
 
+#include <utility>
+
 namespace brave_rewards {
 
-CheckoutDialogController::CheckoutDialogController() = default;
+CheckoutDialogController::CheckoutDialogController(
+    CheckoutDialogParams params)
+    : params_(std::move(params)) {}
 
 CheckoutDialogController::~CheckoutDialogController() = default;
 
-void CheckoutDialogController::NotifyAbort() {
+void CheckoutDialogController::NotifyPaymentAborted() {
   for (auto& observer : observers_) {
-    observer.OnAbort();
+    observer.OnPaymentAborted();
   }
 }
 
-void CheckoutDialogController::NotifyComplete() {
+void CheckoutDialogController::NotifyPaymentCompleted() {
   for (auto& observer : observers_) {
-    observer.OnComplete();
+    observer.OnPaymentCompleted();
   }
 }
 
