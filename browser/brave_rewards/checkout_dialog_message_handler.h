@@ -11,6 +11,7 @@
 #include "base/values.h"
 #include "base/memory/weak_ptr.h"
 #include "brave/browser/brave_rewards/checkout_dialog_controller.h"
+#include "brave/browser/brave_rewards/checkout_dialog_params.h"
 #include "brave/components/brave_rewards/browser/rewards_service.h"
 #include "brave/components/brave_rewards/browser/rewards_service_observer.h"
 #include "brave/components/brave_rewards/browser/rewards_service_observer.h"
@@ -27,7 +28,9 @@ class CheckoutDialogMessageHandler :
     public CheckoutDialogController::Observer {
 
  public:
-  explicit CheckoutDialogMessageHandler(CheckoutDialogController* controller);
+  CheckoutDialogMessageHandler(
+      CheckoutDialogParams* params,
+      CheckoutDialogController* controller);
 
   CheckoutDialogMessageHandler(
       const CheckoutDialogMessageHandler&) = delete;
@@ -45,7 +48,7 @@ class CheckoutDialogMessageHandler :
 
   // CheckoutDialogController::Observer:
   void OnPaymentAborted() override;
-  void OnPaymentCompleted() override;
+  void OnPaymentFulfilled() override;
 
  private:
   RewardsService* GetRewardsService();
@@ -59,6 +62,8 @@ class CheckoutDialogMessageHandler :
   void OnCreateWallet(const base::ListValue* args);
   void OnCancelPayment(const base::ListValue* args);
   void OnGetOrderInfo(const base::ListValue* args);
+  void OnPayWithWallet(const base::ListValue* args);
+  void OnPayWithCreditCard(const base::ListValue* args);
 
   // Rewards service callbacks:
   void FetchBalanceCallback(
@@ -73,6 +78,7 @@ class CheckoutDialogMessageHandler :
   void GetRewardsMainEnabledCallback(bool enabled);
   void CreateWalletCallback(int32_t result);
 
+  CheckoutDialogParams* params_; // Owned by CheckoutDialogDelegate
   CheckoutDialogController* controller_; // Owned by CheckoutDialogDelegate
   RewardsService* rewards_service_ = nullptr; // Immortal
   base::WeakPtrFactory<CheckoutDialogMessageHandler> weak_factory_;

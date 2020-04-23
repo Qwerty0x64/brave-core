@@ -70,16 +70,16 @@ function addWebUIListeners (listeners: object) {
 }
 
 export function createHost (): Host {
-  const stateManager = createStateManager<HostState>({});
+  const stateManager = createStateManager<HostState>({})
   const walletCollator = createWalletCollator()
 
   addWebUIListeners({
 
-    orderInfoUpdated (event: any) {
+    orderInfoUpdated (info: any) {
       stateManager.update({
         orderInfo: {
-          total: Number(event.total),
-          description: String(event.description)
+          total: Number(info.total),
+          description: String(info.description)
         }
       })
     },
@@ -87,9 +87,8 @@ export function createHost (): Host {
     walletBalanceUpdated (event: any) {
       const total = event.total as number
       const rates = event.rates as Record<string, number>
-      const lastUpdated = new Date().toISOString()
-
       // TODO(zenparsing): Get lastUpdated from service
+      const lastUpdated = new Date().toISOString()
 
       stateManager.update({
         walletInfo: walletCollator.setBalance(total),
@@ -133,7 +132,11 @@ export function createHost (): Host {
       chrome.send('getAnonWalletStatus')
     },
 
-    orderCanceled () {
+    paymentFulfilled () {
+      stateManager.update({ paymentStatus: 'fulfilled' })
+    },
+
+    paymentCanceled () {
       chrome.send('dialogClose')
     }
 
@@ -176,13 +179,14 @@ export function createHost (): Host {
     },
 
     payWithCreditCard (cardDetails: CreditCardDetails) {
-      console.log('payWithCreditCard', cardDetails)
-      // TODO(zenparsing): Send update to service
+      chrome.send('payWithCreditCard', [cardDetails])
     },
 
     payWithWallet () {
-      console.log('payWithWallet')
-      // TODO(zenparsing): Send update to service
+      stateManager.update({ paymentStatus: 'processing' })
+      // TODO(zenparsing): Consider passing "total" amount so
+      // that the rewards service can validate it.
+      chrome.send('payWithWallet')
     },
 
     addListener: stateManager.addListener

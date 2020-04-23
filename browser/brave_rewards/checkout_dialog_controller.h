@@ -13,11 +13,6 @@
 
 namespace brave_rewards {
 
-struct CheckoutDialogParams {
-  std::string description;
-  double total;
-};
-
 // Defines the interface between the opener of the checkout dialog
 // and the classes responsible for managing the behavior of the
 // checkout dialog.
@@ -28,12 +23,15 @@ class CheckoutDialogController :
   class Observer : public base::CheckedObserver {
    public:
     virtual void OnPaymentAborted() = 0;
-    virtual void OnPaymentCompleted() = 0;
+    virtual void OnPaymentFulfilled() = 0;
   };
 
-  using OnDialogClosedCallback = base::OnceClosure;
+  using OnDialogClosedCallback = base::OnceCallback<void()>;
+  // TODO(zenparsing): We need to send enough information that the
+  // initiator can aknowledge the payment.
+  using OnPaymentReadyCallback = base::OnceCallback<void()>;
 
-  explicit CheckoutDialogController(CheckoutDialogParams params);
+  CheckoutDialogController();
   ~CheckoutDialogController();
 
   CheckoutDialogController(
@@ -46,12 +44,16 @@ class CheckoutDialogController :
   void NotifyPaymentAborted();
 
   // Notifies the checkout dialog that the payment has been
-  // confirmed as completed by the initiator.
-  void NotifyPaymentCompleted();
+  // fulfilled by the initiating website.
+  void NotifyPaymentFulfilled();
 
-  // Sets a callback that will be called when the checkout
-  // dialog is closed.
+  // Sets a callback that will be run when the checkout dialog
+  // is closed.
   void SetOnDialogClosedCallback(OnDialogClosedCallback callback);
+
+  // Sets a callback that will be run when the payment has been
+  // accepted and is waiting for fulfillment by the initiator.
+  void SetOnPaymentReadyCallback(OnPaymentReadyCallback callback);
 
  private:
   friend class CheckoutDialogMessageHandler;
@@ -61,11 +63,11 @@ class CheckoutDialogController :
   void AddObserver(Observer* observer);
   void RemoveObserver(Observer* observer);
   void NotifyDialogClosed();
-  const CheckoutDialogParams& params() const { return params_; }
+  void NotifyPaymentReady();
 
   base::ObserverList<Observer> observers_;
-  OnDialogClosedCallback closed_callback_;
-  CheckoutDialogParams params_;
+  OnDialogClosedCallback dialog_closed_callback_;
+  OnPaymentReadyCallback payment_ready_callback_;
 };
 
 }  // namespace brave_rewards

@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "brave/browser/brave_rewards/checkout_dialog_controller.h"
+#include "brave/browser/brave_rewards/checkout_dialog_params.h"
 
 namespace content {
 class WebContents;

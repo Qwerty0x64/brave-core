@@ -29,7 +29,7 @@ import {
 
 // A user-defined hook that and an ESC key handler to the
 // document body while the component is mounted.
-function useEscapeKeyHandler(host: Host) {
+function useEscapeKeyHandler (host: Host) {
   const onEscapePressed = React.useCallback((event: KeyboardEvent) => {
     if (event.key.toLowerCase() === 'escape') {
       host.cancelPayment()
@@ -72,6 +72,15 @@ export function App (props: AppProps) {
       setOrderInfo(state.orderInfo)
       setWalletInfo(state.walletInfo)
       setSettings(state.settings)
+
+      switch (state.paymentStatus) {
+        case 'processing':
+          setFlowState('payment-processing')
+          break
+        case 'fulfilled':
+          setFlowState('payment-complete')
+          break
+      }
     })
   }, [props.host])
 
@@ -120,7 +129,8 @@ export function App (props: AppProps) {
   const amountNeeded = Math.max(0, orderInfo.total - walletInfo.balance)
 
   function getAddFundsAmounts () {
-    // TODO(zenparsing): Calculate three options
+    // TODO(zenparsing): Calculate three options. This implementation
+    // will need to be completed for credit card payment integration.
     return []
   }
 

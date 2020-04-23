@@ -16,8 +16,10 @@ using base::BindOnce;
 using base::BindRepeating;
 
 CheckoutDialogMessageHandler::CheckoutDialogMessageHandler(
+    CheckoutDialogParams* params,
     CheckoutDialogController* controller)
-    : controller_(controller),
+    : params_(params),
+      controller_(controller),
       weak_factory_(this) {
   DCHECK(controller_);
   controller_->AddObserver(this);
@@ -31,8 +33,6 @@ CheckoutDialogMessageHandler::~CheckoutDialogMessageHandler() {
 }
 
 RewardsService* CheckoutDialogMessageHandler::GetRewardsService() {
-  // TODO(zenparsing): Consider whether we can do this in constructor
-  // instead.
   if (!rewards_service_) {
     Profile* profile = Profile::FromWebUI(web_ui());
     rewards_service_ = RewardsServiceFactory::GetForProfile(profile);
@@ -75,6 +75,14 @@ void CheckoutDialogMessageHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback("getOrderInfo", BindRepeating(
       &CheckoutDialogMessageHandler::OnGetOrderInfo,
       base::Unretained(this)));
+
+  web_ui()->RegisterMessageCallback("payWithCreditCard", BindRepeating(
+      &CheckoutDialogMessageHandler::OnPayWithCreditCard,
+      base::Unretained(this)));
+
+  web_ui()->RegisterMessageCallback("payWithWallet", BindRepeating(
+      &CheckoutDialogMessageHandler::OnPayWithWallet,
+      base::Unretained(this)));
 }
 
 void CheckoutDialogMessageHandler::OnWalletInitialized(
@@ -94,11 +102,17 @@ void CheckoutDialogMessageHandler::OnRewardsMainEnabled(
 }
 
 void CheckoutDialogMessageHandler::OnPaymentAborted() {
-  // TODO(zenparsing): Perform same functionality as OnCancelPayment
+  // TODO(zenparsing): Handle case where payment is currently
+  // in progress.
+  if (IsJavascriptAllowed()) {
+    FireWebUIListener("paymentCanceled");
+  }
 }
 
-void CheckoutDialogMessageHandler::OnPaymentCompleted() {
-  // TODO(zenparsing): Update flow state to complete
+void CheckoutDialogMessageHandler::OnPaymentFulfilled() {
+  if (IsJavascriptAllowed()) {
+    FireWebUIListener("paymentFulfilled");
+  }
 }
 
 void CheckoutDialogMessageHandler::OnGetWalletBalance(
@@ -164,16 +178,28 @@ void CheckoutDialogMessageHandler::OnCancelPayment(
   // TODO(zenparsing): Cancel the potential order via the
   // rewards service, but do not wait to close the dialog.
   AllowJavascript();
-  FireWebUIListener("orderCanceled");
+  FireWebUIListener("paymentCanceled");
 }
 
 void CheckoutDialogMessageHandler::OnGetOrderInfo(
     const base::ListValue* args) {
   AllowJavascript();
-  base::Value response(base::Value::Type::DICTIONARY);
-  response.SetDoubleKey("total", controller_->params().total);
-  response.SetStringKey("description", controller_->params().description);
-  FireWebUIListener("orderInfoUpdated", response);
+  base::Value order_info(base::Value::Type::DICTIONARY);
+  order_info.SetStringKey("description", params_->description);
+  order_info.SetDoubleKey("total", params_->total);
+  FireWebUIListener("orderInfoUpdated", order_info);
+}
+
+void CheckoutDialogMessageHandler::OnPayWithWallet(
+    const base::ListValue* args) {
+  // TODO(zenparsing): Call rewards service to process payment
+}
+
+void CheckoutDialogMessageHandler::OnPayWithCreditCard(
+    const base::ListValue* args) {
+  // TODO(zenparsing): Implementation required for credit card
+  // integration
+  NOTREACHED();
 }
 
 void CheckoutDialogMessageHandler::FetchBalanceCallback(

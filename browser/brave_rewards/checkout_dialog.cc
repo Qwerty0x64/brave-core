@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 
-#include "base/json/json_writer.h"
 #include "base/values.h"
 #include "brave/browser/brave_rewards/checkout_dialog_message_handler.h"
 #include "brave/common/webui_url_constants.h"
@@ -61,7 +60,7 @@ namespace brave_rewards {
 class CheckoutDialogDelegate : public ui::WebDialogDelegate {
  public:
   explicit CheckoutDialogDelegate(CheckoutDialogParams params)
-      : controller_(std::move(params)) {}
+      : params_(std::move(params)) {}
 
   CheckoutDialogDelegate(const CheckoutDialogDelegate&) = delete;
   CheckoutDialogDelegate& operator=(const CheckoutDialogDelegate&) = delete;
@@ -95,8 +94,9 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
   }
 
   void OnDialogShown(content::WebUI* webui) override {
-    webui->AddMessageHandler(
-        std::make_unique<CheckoutDialogMessageHandler>(&controller_));
+    webui->AddMessageHandler(std::make_unique<CheckoutDialogMessageHandler>(
+        &params_,
+        &controller_));
   }
 
   void OnDialogClosed(const std::string& json_retval) override {
@@ -118,6 +118,7 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
   }
 
  private:
+  CheckoutDialogParams params_;
   CheckoutDialogController controller_;
 };
 

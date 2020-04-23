@@ -9,9 +9,7 @@
 
 namespace brave_rewards {
 
-CheckoutDialogController::CheckoutDialogController(
-    CheckoutDialogParams params)
-    : params_(std::move(params)) {}
+CheckoutDialogController::CheckoutDialogController() = default;
 
 CheckoutDialogController::~CheckoutDialogController() = default;
 
@@ -21,15 +19,20 @@ void CheckoutDialogController::NotifyPaymentAborted() {
   }
 }
 
-void CheckoutDialogController::NotifyPaymentCompleted() {
+void CheckoutDialogController::NotifyPaymentFulfilled() {
   for (auto& observer : observers_) {
-    observer.OnPaymentCompleted();
+    observer.OnPaymentFulfilled();
   }
 }
 
 void CheckoutDialogController::SetOnDialogClosedCallback(
     OnDialogClosedCallback callback) {
-  closed_callback_ = std::move(callback);
+  dialog_closed_callback_ = std::move(callback);
+}
+
+void CheckoutDialogController::SetOnPaymentReadyCallback(
+    OnPaymentReadyCallback callback) {
+  payment_ready_callback_ = std::move(callback);
 }
 
 void CheckoutDialogController::AddObserver(Observer* observer) {
@@ -41,8 +44,14 @@ void CheckoutDialogController::RemoveObserver(Observer* observer) {
 }
 
 void CheckoutDialogController::NotifyDialogClosed() {
-  if (closed_callback_) {
-    std::move(closed_callback_).Run();
+  if (dialog_closed_callback_) {
+    std::move(dialog_closed_callback_).Run();
+  }
+}
+
+void CheckoutDialogController::NotifyPaymentReady() {
+  if (payment_ready_callback_) {
+    std::move(payment_ready_callback_).Run();
   }
 }
 

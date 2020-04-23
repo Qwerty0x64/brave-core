@@ -24,6 +24,11 @@ export interface ExchangeRateInfo {
   lastUpdated: string
 }
 
+export type PaymentStatus =
+  '' |
+  'processing' |
+  'fulfilled'
+
 export interface OrderInfo {
   description: string
   total: number
@@ -38,6 +43,7 @@ export interface HostState {
   exchangeRateInfo?: ExchangeRateInfo
   orderInfo?: OrderInfo
   settings?: Settings
+  paymentStatus?: PaymentStatus
 }
 
 export type HostListener = (state: HostState) => void
