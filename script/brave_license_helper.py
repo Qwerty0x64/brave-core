@@ -149,3 +149,8 @@ def AddBraveCredits(prune_paths, special_cases, prune_dirs, additional_paths):
     additional_paths = tuple(additional_list)
 
     return (prune_dirs, additional_paths)
+
+
+def CheckBraveMissingLicense(path, error):
+    if path.startswith('brave/'):
+        raise error
