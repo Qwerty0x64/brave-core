@@ -14,7 +14,6 @@
 #include "brave/browser/brave_rewards/checkout_dialog_params.h"
 #include "brave/components/brave_rewards/browser/rewards_service.h"
 #include "brave/components/brave_rewards/browser/rewards_service_observer.h"
-#include "brave/components/brave_rewards/browser/rewards_service_observer.h"
 #include "content/public/browser/web_ui_message_handler.h"
 
 namespace brave_rewards {

@@ -184,8 +184,6 @@ export function createHost (): Host {
 
     payWithWallet () {
       stateManager.update({ paymentStatus: 'processing' })
-      // TODO(zenparsing): Consider passing "total" amount so
-      // that the rewards service can validate it.
       chrome.send('payWithWallet')
     },
 

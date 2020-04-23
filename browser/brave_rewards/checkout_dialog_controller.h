@@ -6,8 +6,8 @@
 #ifndef BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_CONTROLLER_H_
 #define BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_CONTROLLER_H_
 
-#include "base/memory/weak_ptr.h"
 #include "base/callback.h"
+#include "base/memory/weak_ptr.h"
 #include "base/observer_list.h"
 #include "base/observer_list_types.h"
 
@@ -26,7 +26,10 @@ class CheckoutDialogController :
     virtual void OnPaymentFulfilled() = 0;
   };
 
+  // TODO(zenparsing): We should provide a "payment_fulfilled"
+  // flag to the callback.
   using OnDialogClosedCallback = base::OnceCallback<void()>;
+
   // TODO(zenparsing): We need to send enough information that the
   // initiator can aknowledge the payment.
   using OnPaymentReadyCallback = base::OnceCallback<void()>;

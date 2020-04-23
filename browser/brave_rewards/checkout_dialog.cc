@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "base/values.h"
 #include "brave/browser/brave_rewards/checkout_dialog_message_handler.h"

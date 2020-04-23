@@ -6,9 +6,6 @@
 #ifndef BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_H_
 #define BRAVE_BROWSER_BRAVE_REWARDS_CHECKOUT_DIALOG_H_
 
-#include <string>
-#include <vector>
-
 #include "brave/browser/brave_rewards/checkout_dialog_controller.h"
 #include "brave/browser/brave_rewards/checkout_dialog_params.h"
 

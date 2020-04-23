@@ -1178,9 +1178,16 @@ BraveRewardsShowCheckoutDialogFunction::Run() {
                             base::NumberToString(params->tab_id)));
   }
 
-  auto controller = ::brave_rewards::ShowCheckoutDialog(
-      contents,
-      {"Some product description", 15.0});
+  using ::brave_rewards::CheckoutDialogParams;
+  using ::brave_rewards::ShowCheckoutDialog;
+
+  auto controller = ShowCheckoutDialog(contents, {
+      "Some product description",
+      15.0,
+      {
+        {"fake-sku", 1}
+      }
+  });
 
   controller->SetOnDialogClosedCallback(base::BindOnce(
       &BraveRewardsShowCheckoutDialogFunction::OnDialogClosed,
