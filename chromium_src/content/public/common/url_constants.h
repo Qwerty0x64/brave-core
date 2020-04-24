@@ -6,5 +6,6 @@
 
 namespace content {
 CONTENT_EXPORT extern const char kBraveUIScheme[];
+CONTENT_EXPORT extern const char kkBinanceScheme[];
 }
 

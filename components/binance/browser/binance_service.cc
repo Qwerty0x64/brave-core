@@ -73,7 +73,7 @@ GURL GetURLWithPath(const std::string& host, const std::string& path) {
 }
 
 std::string GetHexEncodedCryptoRandomSeed() {
-  const size_t kSeedByteLength = 28;
+  const size_t kSeedByteLength = 32;
   // crypto::RandBytes is fail safe.
   uint8_t random_seed_bytes[kSeedByteLength];
   crypto::RandBytes(random_seed_bytes, kSeedByteLength);

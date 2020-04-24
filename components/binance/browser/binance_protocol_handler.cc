@@ -46,7 +46,8 @@ void LoadNewTabURL(
     const GURL& url,
     content::WebContents::OnceGetter web_contents_getter,
     ui::PageTransition page_transition,
-    bool has_user_gesture) {
+    bool has_user_gesture,
+    const base::Optional<url::Origin> initiating_origin) {
   content::WebContents* web_contents = std::move(web_contents_getter).Run();
   if (!web_contents) {
     return;
@@ -58,7 +59,10 @@ void LoadNewTabURL(
   }
 
   // We should only allow binance scheme to be used from accounts.binance.com
-  if (!web_contents->GetURL().DomainIs("accounts.binance.com")) {
+  const char allowed_origin[] = "accounts.binance.com";
+  if (!web_contents->GetURL().DomainIs(allowed_origin) &&
+      initiating_origin.has_value() &&
+      initiating_origin.value().DomainIs(allowed_origin)) {
     return;
   }
 
@@ -74,12 +78,13 @@ namespace binance {
 void HandleBinanceProtocol(const GURL& url,
                            content::WebContents::OnceGetter web_contents_getter,
                            ui::PageTransition page_transition,
-                           bool has_user_gesture) {
+                           bool has_user_gesture,
+                           const base::Optional<url::Origin>& initiating_origin) {
   DCHECK(IsBinanceProtocol(url));
   base::PostTask(
       FROM_HERE, {content::BrowserThread::UI},
       base::BindOnce(&LoadNewTabURL, url, std::move(web_contents_getter),
-                     page_transition, has_user_gesture));
+                     page_transition, has_user_gesture, initiating_origin));
 }
 
 bool IsBinanceProtocol(const GURL& url) {
